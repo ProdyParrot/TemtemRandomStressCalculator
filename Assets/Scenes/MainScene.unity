@@ -852,7 +852,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: Max encounters between lumas
+  m_Text: Max encounters between all lumas
 --- !u!222 &297878936
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -904,7 +904,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 13, y: 0}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &339236828
@@ -1756,7 +1756,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: version 1.3
+  m_Text: version 1.4
 --- !u!222 &549499532
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -2113,7 +2113,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: Average encounters before a luma
+  m_Text: Luma Chance (all encounters and tems)
 --- !u!222 &794958769
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -2728,7 +2728,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: Average encounters before a featured luma
+  m_Text: Median luma (all encounters and tems)
 --- !u!222 &918611532
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -4223,7 +4223,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: Min encounters between lumas
+  m_Text: Min encounters between all lumas
 --- !u!222 &1407338213
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -4381,7 +4381,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: Median encounters before a featured luma
+  m_Text: Median luma (featured encounters and tems only)
 --- !u!222 &1466624543
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -6647,7 +6647,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: Median encounters before a luma
+  m_Text: Luma Chance (all encounters, featured tems only)
 --- !u!222 &2086811096
 CanvasRenderer:
   m_ObjectHideFlags: 0
