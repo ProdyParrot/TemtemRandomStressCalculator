@@ -1671,7 +1671,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: version 1.1
+  m_Text: version 1.2
 --- !u!222 &549499532
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -2028,7 +2028,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: Average luma per encounter
+  m_Text: Average encounters before a luma
 --- !u!222 &794958769
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -6165,7 +6165,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: Median luma per encounter
+  m_Text: Median encounters before a luma
 --- !u!222 &2086811096
 CanvasRenderer:
   m_ObjectHideFlags: 0
