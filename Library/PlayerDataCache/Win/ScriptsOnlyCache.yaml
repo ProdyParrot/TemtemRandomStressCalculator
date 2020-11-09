@@ -501,4 +501,4 @@ ScriptsOnlyBuild:
   platform: 5
   scenePathNames:
   - Assets/Scenes/MainScene.unity
-  playerPath: C:/Users/Prody/Desktop/temtemRandomStressCalc/RandomTest.exe
+  playerPath: C:/Users/Prody/Desktop/Temtem Random Stress Calculator/RandomTest.exe

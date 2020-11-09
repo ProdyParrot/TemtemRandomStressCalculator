@@ -22,14 +22,20 @@ public class MainLogic : MonoBehaviour
     private int lumaInputNumber;
     private List<int> counter = new List<int>();
     private List<int> sinceLastList = new List<int>();
+    private List<int> sinceLastFeaturedList = new List<int>();
     private int sinceLast = 0;
-    private float percent;
-    private float percent2;
+    private int sinceLastFeatured = 0;
     private int lumaCount1;
     private int lumaCount2;
     private int lumaCount3;
     private int lumaCount4;
     private bool hit;
+    private bool featuredHit;
+
+    private float tempMedian = 0.0f;
+    private float tempFeaturedMedian = 0.0f;
+    private float tempAverage = 0.0f;
+    private float tempFeaturedAverage = 0.0f;
 
     private void Start()
     {
@@ -46,6 +52,7 @@ public class MainLogic : MonoBehaviour
             if (hit)
             {
                 hit = false;
+                featuredHit = false;
                 running = false;
                 goButton.interactable = true;
                 runButton.interactable = true;
@@ -68,6 +75,7 @@ public class MainLogic : MonoBehaviour
             counter[2]++;
             if (Random.Range(0, 10000) < lumaInputNumber)
             {
+                featuredHit = true;
                 counter[4]++;
                 return true;
             }
@@ -77,6 +85,7 @@ public class MainLogic : MonoBehaviour
             counter[1]++;
             if (Random.Range(0, 10000) == 9999)
             {
+                featuredHit = false;
                 counter[3]++;
                 return true;
             }
@@ -150,34 +159,113 @@ public class MainLogic : MonoBehaviour
         }
     }
 
-    bool FiveCheck()
+    int FiveCheck()
     {
+        int matched = 0;
         if (Random.Range(0, 2) == 1)
         {
-            return false;
+            matched++;
         }
         if (Random.Range(0, 2) == 1)
         {
-            return false;
+            matched++;
         }
-        if (Random.Range(0, 6) > 0)
+        if (Random.Range(0, 6) == 5)
         {
-            return false;
+            matched++;
         }
-        if (Random.Range(0, 6) > 0)
+        if (Random.Range(0, 6) == 5)
         {
-            return false;
+            matched++;
         }
-        if (Random.Range(0, 6) > 0)
+        if (Random.Range(0, 6) == 5)
         {
-            return false;
+            matched++;
         }
-        return true;
+        return matched;
+    }
+
+    public float CalculateAverage(bool featured = false)
+    {
+        float average = 0.0f;
+        if (!featured)
+        {
+            foreach (int item in sinceLastList)
+            {
+                average += item;
+            }
+            average = (average) / (float)sinceLastList.Count;
+        }
+        else
+        {
+            foreach (int item in sinceLastFeaturedList)
+            {
+                average += item;
+            }
+            average = (average) / (float)sinceLastFeaturedList.Count;
+        }
+        return average;
+    }
+
+    public float CalculateMedian(List<int> inputList)
+    {
+        int total = 0;
+        int count = 0;
+        int middleSpot = 0;
+        float median = 0.0f;
+        bool evenMedian = false;
+        bool evenMedianStep = false;
+        bool medianCalculated = false;
+
+        middleSpot = (int)Mathf.Floor(inputList.Count / 2);
+
+        // Even number count
+        if (inputList.Count % 2 == 0)
+        {
+            // Even
+            evenMedian = true;
+        }
+        else
+        {
+            // Odd
+            evenMedian = false;
+        }
+
+        foreach (int item in inputList)
+        {
+            total += item;
+            count++;
+            if (!medianCalculated && count == middleSpot)
+            {
+                if (evenMedian)
+                {
+                    if (evenMedianStep)
+                    {
+                        median += item;
+                        median *= 0.5f;
+                        medianCalculated = true;
+                    }
+                    else
+                    {
+                        evenMedianStep = true;
+                        middleSpot += 1;
+                        median = item;
+                    }
+                }
+                else
+                {
+                    median = item;
+                    medianCalculated = true;
+                }
+            }
+        }
+        return median;
     }
 
     public void RunButton()
     {
         hit = false;
+        featuredHit = false;
         running = true;
         goButton.interactable = false;
         runButton.interactable = false;
@@ -190,13 +278,8 @@ public class MainLogic : MonoBehaviour
             inputNumber = int.Parse(inputRef.text);
         }
 
-        int total = 0;
-        int count = 0;
-        int middleSpot = 0;
-        float median = 0.0f;
-        bool evenMedian = false;
-        bool evenMedianStep = false;
-        bool medianCalculated = false;
+        hit = false;
+        featuredHit = false;
 
         processText.SetActive(true);
         switch (mode)
@@ -215,70 +298,43 @@ public class MainLogic : MonoBehaviour
                     {
                         hit = true;
                         sinceLastList.Add(sinceLast);
+                        
+                        if (featuredHit)
+                        {
+                            sinceLastFeaturedList.Add(sinceLast);
+                            sinceLastFeatured = 0;
+                        }
+
+                        // Calculate min and max
                         counter[5] = Mathf.Max(sinceLast, counter[5]);
                         counter[6] = Mathf.Min(sinceLast, counter[6]);
+
+                        // Reset since last luma encounter
                         sinceLast = 0;
                     }
                     else
                     {
                         sinceLast++;
+                        sinceLastFeatured++;
                     }
                 }
 
-                // Recalculate median
-                if (hit && sinceLastList.Count > 0)
+                // Calculate median and average
+                
+                if (hit)
                 {
-                    middleSpot = (int)Mathf.Floor(sinceLastList.Count / 2);
-
-                    // Even number count
-                    if (sinceLastList.Count % 2 == 0)
+                    sinceLastList.Sort();
+                    tempMedian = CalculateMedian(sinceLastList);
+                    if (sinceLastList.Count > 0)
                     {
-                        // Even
-                        evenMedian = true;
-                    }
-                    else
-                    {
-                        // Odd
-                        evenMedian = false;
-                    }
-
-                    foreach (int item in sinceLastList)
-                    {
-                        total += item;
-                        count++;
-                        if (!medianCalculated && count == middleSpot)
+                        tempAverage = CalculateAverage();
+                        if (featuredHit)
                         {
-                            if (evenMedian)
-                            {
-                                if (evenMedianStep)
-                                {
-                                    median += item;
-                                    median *= 0.5f;
-                                    medianCalculated = true;
-                                }
-                                else
-                                {
-                                    evenMedianStep = true;
-                                    middleSpot += 1;
-                                    median = item;
-                                }
-                            }
-                            else
-                            {
-                                median = item;
-                                medianCalculated = true;
-                            }
+                            sinceLastFeaturedList.Sort();
+                            tempFeaturedMedian = CalculateMedian(sinceLastFeaturedList);
+                            tempFeaturedAverage = CalculateAverage(true);
                         }
                     }
-                }
-
-                if (sinceLastList.Count > 0)
-                {
-                    percent = (float)total / (float)sinceLastList.Count;
-                }
-                else
-                {
-                    percent = 0;
                 }
 
                 textCounter[0].text = counter[0].ToString();
@@ -286,27 +342,31 @@ public class MainLogic : MonoBehaviour
                 textCounter[2].text = counter[2].ToString();
                 textCounter[3].text = counter[3].ToString();
                 textCounter[4].text = counter[4].ToString();
-                textCounter[5].text = percent.ToString();
-                textCounter[6].text = median.ToString();
-                textCounter[7].text = counter[5].ToString();
-                textCounter[8].text = counter[6].ToString();
+                textCounter[5].text = tempAverage.ToString();
+                textCounter[6].text = tempMedian.ToString();
+                textCounter[7].text = tempFeaturedAverage.ToString();
+                textCounter[8].text = tempFeaturedMedian.ToString();
+                textCounter[9].text = counter[5].ToString();
+                textCounter[10].text = counter[6].ToString();
 
+                // Max
                 if (counter[5] == 0)
                 {
-                    textCounter[7].text = "No encounters";
+                    textCounter[9].text = "No encounters";
                 }
                 else
                 {
-                    textCounter[7].text = counter[5].ToString();
+                    textCounter[9].text = counter[5].ToString();
                 }
 
+                // Min
                 if (counter[6] == 2147483647)
                 {
-                    textCounter[8].text = "No encounters";
+                    textCounter[10].text = "No encounters";
                 }
                 else
                 {
-                    textCounter[8].text = counter[6].ToString();
+                    textCounter[10].text = counter[6].ToString();
                 }
                 break;
             case 2:
@@ -327,26 +387,38 @@ public class MainLogic : MonoBehaviour
                 textCounter[3].text = counter[3].ToString();
                 textCounter[4].text = counter[4].ToString();
 
-                percent = (float)counter[1] / (float)counter[0];
-                textCounter[5].text = percent.ToString();
+                float tempFloatHolder = 0.0f;
+                float tempFloatHolder2 = 0.0f;
 
-                percent = (float)counter[2] / (float)counter[0];
-                percent *= 100.0f;
-                percent2 = 100.0f - percent;
-                textCounter[6].text = percent.ToString() + "%";
+                // Calculate average
+                tempFloatHolder = (float)counter[1] / (float)counter[0];
+                textCounter[5].text = tempFloatHolder.ToString();
 
-                percent = (float)counter[4] / (float)counter[0];
-                percent *= 100.0f;
-                textCounter[7].text = percent.ToString() + "%";
+                // Chance of getting 1 luma per radar
+                tempFloatHolder = (float)counter[2] / (float)counter[0];
+                tempFloatHolder *= 100.0f;
+                tempFloatHolder2 = 100.0f - tempFloatHolder;
+                textCounter[6].text = tempFloatHolder.ToString() + "%";
 
-                textCounter[8].text = percent2.ToString() + "%";
+                // Chance of getting more than 1 luma per radar
+                tempFloatHolder = (float)counter[4] / (float)counter[0];
+                tempFloatHolder *= 100.0f;
+                textCounter[7].text = tempFloatHolder.ToString() + "%";
+
+                // Chance of getting 0 lumas per radar
+                textCounter[8].text = tempFloatHolder2.ToString() + "%";
                 break;
             // fish
             case 3:
                 for (int j = 0; j < inputNumber; j++)
                 {
                     counter[0]++;
-                    if (FiveCheck())
+                    int matched = FiveCheck();
+                    if (matched == 4)
+                    {
+                        counter[4]++;
+                    }
+                    if (matched == 5)
                     {
                         hit = true;
                         counter[1]++;
@@ -366,70 +438,24 @@ public class MainLogic : MonoBehaviour
                 textCounter[0].text = counter[0].ToString();
                 textCounter[1].text = counter[1].ToString();
 
-                percent = (float)counter[1] / (float)counter[0];
-                textCounter[2].text = percent.ToString();
-                percent *= 100.0f;
-                textCounter[3].text = percent.ToString() + "%";
+                float tempFloatHolder3 = 0.0f;
 
-                // Recalculate median
+                tempFloatHolder3 = (float)counter[1] / (float)counter[0];
+                textCounter[2].text = tempFloatHolder3.ToString();
+                tempFloatHolder3 *= 100.0f;
+                textCounter[3].text = tempFloatHolder3.ToString() + "%";
+
+                // Calculate median and average
                 if (hit && sinceLastList.Count > 0)
                 {
-                    middleSpot = (int)Mathf.Floor(sinceLastList.Count / 2);
-
-                    // Even number count
-                    if (sinceLastList.Count % 2 == 0)
-                    {
-                        // Even
-                        evenMedian = true;
-                    }
-                    else
-                    {
-                        // Odd
-                        evenMedian = false;
-                    }
-
-                    foreach (int item in sinceLastList)
-                    {
-                        total += item;
-                        count++;
-                        if (!medianCalculated && count == middleSpot)
-                        {
-                            if (evenMedian)
-                            {
-                                if (evenMedianStep)
-                                {
-                                    median += item;
-                                    median *= 0.5f;
-                                    medianCalculated = true;
-                                }
-                                else
-                                {
-                                    evenMedianStep = true;
-                                    middleSpot += 1;
-                                    median = item;
-                                }
-                            }
-                            else
-                            {
-                                median = item;
-                                medianCalculated = true;
-                            }
-                        }
-                    }
+                    sinceLastList.Sort();
+                    tempMedian = CalculateMedian(sinceLastList);
+                    tempAverage = CalculateAverage();
                 }
+                textCounter[4].text = tempAverage.ToString();
+                textCounter[5].text = tempMedian.ToString();
 
-                if (sinceLastList.Count > 0)
-                {
-                    percent = (float)total / (float)sinceLastList.Count;
-                }
-                else
-                {
-                    percent = 0;
-                }
-                textCounter[4].text = percent.ToString();
-
-                textCounter[5].text = median.ToString();
-
+                // Max
                 if (counter[2] == 0)
                 {
                     textCounter[6].text = "No encounters";
@@ -439,6 +465,7 @@ public class MainLogic : MonoBehaviour
                     textCounter[6].text = counter[2].ToString();
                 }
 
+                // Min
                 if (counter[3] == 2147483647)
                 {
                     textCounter[7].text = "No encounters";
@@ -447,9 +474,19 @@ public class MainLogic : MonoBehaviour
                 {
                     textCounter[7].text = counter[3].ToString();
                 }
+
+                // 4/5
+                textCounter[8].text = counter[4].ToString();
+
+                // Average 4/5
+                float tempFloatHolder4 = 0.0f;
+                tempFloatHolder4 = (float)counter[4] / (float)counter[0];
+                tempFloatHolder4 *= 100.0f;
+                textCounter[9].text = tempFloatHolder4.ToString() + "%";
                 break;
             default:
                 hit = true;
+                featuredHit = true;
                 break;
         }
         processText.SetActive(false);
@@ -472,13 +509,21 @@ public class MainLogic : MonoBehaviour
         uiGroupRef[3].SetActive(false);
         uiGroupRef[4].SetActive(true);
         uiGroupRef[5].SetActive(false);
-        ToggleNumbers(9, false);
+        ToggleNumbers(11, false);
         sinceLastList.Clear();
+        sinceLastFeaturedList.Clear();
         sinceLast = 0;
+        sinceLastFeatured = 0;
         running = false;
         hit = false;
+        featuredHit = false;
         goButton.interactable = true;
         runButton.interactable = true;
+
+        tempMedian = 0.0f;
+        tempFeaturedMedian = 0.0f;
+        tempAverage = 0.0f;
+        tempFeaturedAverage = 0.0f;
     }
 
     public void MenuButton(int inputMode)
@@ -491,17 +536,17 @@ public class MainLogic : MonoBehaviour
         {
             case 1:
                 counter[6] = 2147483647;
-                ToggleNumbers(9, true);
+                ToggleNumbers(11, true);
                 uiGroupRef[5].SetActive(true);
-                textCounter[7].text = "No encounters";
-                textCounter[8].text = "No encounters";
+                textCounter[9].text = "No encounters";
+                textCounter[10].text = "No encounters";
                 break;
             case 2:
                 ToggleNumbers(9, true);
                 break;
             case 3:
                 counter[3] = 2147483647;
-                ToggleNumbers(8, true);
+                ToggleNumbers(10, true);
                 textCounter[6].text = "No encounters";
                 textCounter[7].text = "No encounters";
                 break;
